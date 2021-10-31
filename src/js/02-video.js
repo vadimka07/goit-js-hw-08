@@ -1,15 +1,17 @@
+// import './sass/main.scss';
 import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
 
 const iframe = document.getElementById('vimeo-player');
 const player = new Player(iframe);
-const getTimeLocaleStorage = localStorage.getItem('videoplayer-current-time');
-player.setCurrentTime(getTimeLocaleStorage).then(function (currentTime) {
-}).catch(function (error) {
-  console.log(error);
-});
-let setIntervalFunction = (currentTime) => {
-  let seconds = currentTime.seconds; //get current time
-  localStorage.setItem('videoplayer-current-time', seconds);
+const KEY_LS = "videoplayer-current-time";
+const secondsToLs = ({seconds})=> localStorage.setItem(KEY_LS, seconds);
+function checkKEyLocaleStorage() {
+  const secondsFromLs = localStorage.getItem(KEY_LS);
+  if(secondsFromLs) {
+    player.setCurrentTime(secondsFromLs);
+  }
 }
-player.on('timeupdate', throttle(setIntervalFunction, 1000));
+player.on('timeupdate',  throttle(secondsToLs, 1000))
+
+window.addEventListener('DOMContentLoaded', checkKEyLocaleStorage)
